@@ -1,3 +1,7 @@
+.idea
+
+markdownfiles/*/
+
 # Logs
 logs
 *.log
