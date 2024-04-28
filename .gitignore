@@ -1,6 +1,7 @@
 .idea
 
-markdownfiles/*/
+markdownfiles/
+markdownfiles/README.md
 
 # Logs
 logs
