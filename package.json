@@ -1,0 +1,23 @@
+{
+  "name": "markdown-bundler",
+  "version": "0.0.0",
+  "description": "got a whole bunch of markdown files in and get static site html out",
+  "main": "index.ts",
+  "scripts": {
+    "ts-run": "ts-node",
+    "build": "ts-node -- index.ts"
+  },
+  "author": "Stefan Temme",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.12",
+    "showdown": "^2.1.0",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/showdown": "^2.0.6"
+  }
+}
