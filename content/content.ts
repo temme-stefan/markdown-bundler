@@ -43,7 +43,10 @@ converter.listen("anchors.after", (_, text) => {
     return text.replace(pattern, (match) => {
         match = match
             .replace(".md", "")
-            .replace(/href="[^/#]/, (relative)=>relative.substring(0,relative.length-1)+"/"+relative.substring(relative.length-1))
+            .replace(/\/+/, "/")
+            .replace(/href="[^/#]/, (relative) => {
+                return relative.substring(0, relative.length - 1) + "/" + relative.substring(relative.length - 1)
+            })
             .replace(/#.*/, (hash) => {
                 hash = decodeURIComponent(hash)
                     .replace(/ /g, "")
@@ -53,6 +56,12 @@ converter.listen("anchors.after", (_, text) => {
             });
         return match;
     })
+});
+
+converter.listen("completeHTMLDocument.after", (_, text) => {
+    return text.replace("</head>", `
+     <link rel="stylesheet" href="/style/index.css">
+</head>`);
 });
 
 export const getPosts = () => {

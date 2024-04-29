@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {emptyDir, ensureDir, outputFile} from 'fs-extra';
+import {copy, emptyDir, ensureDir, outputFile} from 'fs-extra';
 import {getPosts} from "./content/content";
 
 const buildpath = "build";
@@ -20,13 +20,18 @@ User-Agent: *
 Disallow: /`);
 }
 
+async function addStyles() {
+
+    await copy("style", path.join(buildpath, "style"));
+}
+
 emptyBuildFolder().then(async () => {
     const posts = getPosts();
     await Promise.all([...posts.map(async post => {
         const p = path.join(buildpath, post.slug, "index.html");
         console.log("Creating", post.slug)
         await outputFile(p, post.html);
-    }), addRobots()])
+    }), addRobots(), addStyles()])
     console.log("done");
 });
 
