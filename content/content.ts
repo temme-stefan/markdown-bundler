@@ -3,6 +3,7 @@ import * as path from 'path';
 import {globSync} from 'glob';
 import * as dotenv from 'dotenv';
 import {Converter} from 'showdown';
+import {pathesToFileTree, TNode} from "./FileTree";
 
 dotenv.config();
 
@@ -33,15 +34,35 @@ const converter = new Converter({
 });
 
 const fakeMeta = {title: "", lang: "de"}
-converter.listen("completeHTMLDocument.before", (evtName, text, converter, options, globals) => {
+converter.listen("completeHTMLDocument.before", (_, text, __, ___, globals) => {
     globals.metadata.parsed = {...globals.metadata.parsed, ...fakeMeta};
     return `<h1>${fakeMeta.title}</h1>\n${text}`;
 });
+converter.listen("anchors.after", (_, text) => {
+    const pattern = /href="[^"]*/g;
+    return text.replace(pattern, (match) => {
+        match = match
+            .replace(".md", "")
+            .replace(/href="[^/#]/, "href=\"/")
+            .replace(/#.*/, (hash) => {
+                hash = decodeURIComponent(hash)
+                    .replace(/ /g, "")
+                    .replace(/[&+$,\/:;=?@"{}|^¨~\[\]`\\*)(%.!'<>]/g, '')
+                    .toLowerCase();
+                return hash;
+            });
+        return match;
+    })
+});
+
 export const getPosts = () => {
     const slugs: string[] = [];
-    const posts = fileInfos.map((fileinfo) => {
+    const posts = getFiles().map((fileinfo) => {
         const {dir, name} = path.parse(fileinfo.filename);
-        const slug = `${dir}${dir ? "/" : ""}${name}`;
+        let slug = `${dir}/${name}`;
+        if (!slug.startsWith("/")) {
+            slug = `/${slug}`;
+        }
         slugs.push(slug);
         const title = fileinfo.name;
         fakeMeta.title = title;
@@ -49,7 +70,7 @@ export const getPosts = () => {
 
         return {slug, title, html, filename: fileinfo.filename};
     })
-
+    slugs.sort();
     const slugTree = pathesToFileTree(slugs);
     const folder: TNode[] = [];
     let stack = [slugTree];
@@ -65,34 +86,13 @@ export const getPosts = () => {
         let current = item;
         while (current.parent != null) {
             current = current.parent;
-            slug = `${current.name}/${slug}`;
+            slug = `${current.name}${current.name.endsWith("/") ? "" : "/"}${slug}`;
         }
         fakeMeta.title = item.name;
         const md = [...item.children.values()].map(({name}) => `* [${name}](${encodeURI(name)})`).join("\n");
         const html = converter.makeHtml(md);
         return {slug, title: item.name, filename: slug, html}
     });
-    return [...posts,...linkLists]
+    return [...posts, ...linkLists]
 }
 
-type TNode = { name: string, children: Map<string, TNode>, parent?: TNode }
-
-function pathesToFileTree(pathes: string[]): TNode {
-    const tree = {
-        name: "",
-        children: new Map(),
-        parent: null
-    };
-    pathes.forEach(path => {
-        const parts = path.split("/");
-        let current = tree;
-        for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            if (!current.children.has(part)) {
-                current.children.set(part, {name: part, children: new Map(), parent: current});
-            }
-            current = current.children.get(part);
-        }
-    });
-    return tree;
-}
