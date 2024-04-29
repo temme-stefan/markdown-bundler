@@ -13,18 +13,16 @@ async function emptyBuildFolder() {
     }
 }
 
-emptyBuildFolder().then(() => {
+emptyBuildFolder().then(async () => {
     const posts = getPosts();
     const replacements = new Map(posts.map(({slug,filename})=>[encodeURI(filename),encodeURI(slug)]));
     const reg = new RegExp(`(${[...replacements.keys()].join("|")})`,"g")
     const fixLinks = (html:string)=>html.replace(reg,(found)=>replacements.get(found) ??found);
-
-
-    Promise.all(posts.map(async post => {
+    await Promise.all(posts.map(async post => {
         const p = path.join(buildpath, post.slug, "index.html");
-
         await outputFile(p, fixLinks(post.html));
     }))
+    console.log("done");
 });
 
 
