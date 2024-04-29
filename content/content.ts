@@ -43,7 +43,7 @@ converter.listen("anchors.after", (_, text) => {
     return text.replace(pattern, (match) => {
         match = match
             .replace(".md", "")
-            .replace(/href="[^/#]/, "href=\"/")
+            .replace(/href="[^/#]/, (relative)=>relative.substring(0,relative.length-1)+"/"+relative.substring(relative.length-1))
             .replace(/#.*/, (hash) => {
                 hash = decodeURIComponent(hash)
                     .replace(/ /g, "")
@@ -89,7 +89,7 @@ export const getPosts = () => {
             slug = `${current.name}${current.name.endsWith("/") ? "" : "/"}${slug}`;
         }
         fakeMeta.title = item.name;
-        const md = [...item.children.values()].map(({name}) => `* [${name}](${encodeURI(name)})`).join("\n");
+        const md = [...item.children.values()].map(({name}) => `* [${name}](${encodeURI(`${slug}/${name}`)})`).join("\n");
         const html = converter.makeHtml(md);
         return {slug, title: item.name, filename: slug, html}
     });
