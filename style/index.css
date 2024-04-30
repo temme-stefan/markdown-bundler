@@ -41,6 +41,12 @@ body {
     max-width: 99%;
     overflow: hidden;
 }
+:not(body)>a, :not(body)>em,:not(body)>strong {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    box-shadow: unset;
+}
 
 /* Media */
 img, video, iframe {
@@ -58,11 +64,11 @@ img, video, iframe {
 
 /* Rotations */
 
-*:nth-child(odd):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table) {
+*:nth-child(odd):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {
     transform: rotate(2deg);
 }
 
-*:nth-child(even):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table) {
+*:nth-child(even):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {
     transform: rotate(-2deg);
 }
 
