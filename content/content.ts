@@ -29,6 +29,7 @@ export const getFiles = () => fileInfos;
 const converter = new Converter({
     tables: true,
     moreStyling: true,
+    strikethrough: true,
     metadata: true,
     completeHTMLDocument: true
 });

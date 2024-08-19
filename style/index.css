@@ -41,7 +41,7 @@ body {
     max-width: 99%;
     overflow: hidden;
 }
-:not(body)>a, :not(body)>em,:not(body)>strong {
+:not(body)>a, :not(body)>em,:not(body)>strong, :not(body)>del, :not(body)>sup, :not(body)>sub  {
     margin: 0;
     border: 0;
     padding: 0;
