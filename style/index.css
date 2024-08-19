@@ -64,13 +64,13 @@ img, video, iframe {
 
 /* Rotations */
 
-*:nth-child(odd):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {
-    transform: rotate(2deg);
-}
+/**:nth-child(odd):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {*/
+/*    transform: rotate(2deg);*/
+/*}*/
 
-*:nth-child(even):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {
-    transform: rotate(-2deg);
-}
+/**:nth-child(even):not(body):not(html):not(tr,td,th,thead,tbody,tfoot,table):not(li) {*/
+/*    transform: rotate(-2deg);*/
+/*}*/
 
 hr {
     width: 50% !important;
