@@ -38,7 +38,6 @@ body {
     box-sizing: border-box;
     border: solid 0.1em #4140344E;
     width: fit-content;
-    max-width: 99%;
     overflow: hidden;
 }
 :not(body)>a, :not(body)>em,:not(body)>strong, :not(body)>del, :not(body)>sup, :not(body)>sub  {
