@@ -7,7 +7,6 @@ import {pathesToFileTree, TNode} from "./FileTree";
 
 dotenv.config();
 
-console.log(process.env.MD_BASEFOLDER);
 const base = process.env.MD_BASEFOLDER ?? "markdownfiles";
 const glob = process.env.MD_GLOB ?? "*.md";
 
@@ -36,6 +35,8 @@ const converter = new Converter({
 });
 
 const template = readFileSync("content/template.html", {encoding: "utf8"});
+const startTitle = "Die Gezeichneten der Familie";
+const startPage = "content/startpage.md";
 
 converter.listen("anchors.after", (_, text) => {
     const pattern = /href="[^"]*/g;
@@ -114,20 +115,22 @@ export const getPosts = () => {
 
    const nav = createNav([...slugToFileinfo.keys()]);
 
-   const posts = [...slugToFileinfo.entries()].map(([slug,fileinfo])=>{
-        const title = fileinfo.name;
-        const content = converter.makeHtml(readFileSync(fileinfo.filepath, {encoding: "utf8"}));
+    function renderToTemplate(filepath: string, title: string) {
+        const content = converter.makeHtml(readFileSync(filepath, {encoding: "utf8"}));
         const html = template
             .replace(/%title%/g, title)
             .replace(/%content%/, content)
             .replace(/%nav%/, nav);
+        return html;
+    }
+
+    const posts = [...slugToFileinfo.entries()].map(([slug,fileinfo])=>{
+        const title = fileinfo.name;
+        const filepath = fileinfo.filepath;
+        const html = renderToTemplate(filepath, title);
         return {slug, title, html, filename: fileinfo.filename};
     })
-    const startTitle = "Die Gezeichneten der Familie"
-    const startpage = {slug:"/",title:startTitle,html:template
-            .replace(/%title%/g, startTitle)
-            .replace(/%content%/, "<p>Notizen und Gedanken zu unserer Gezeichnetenkampagne.</p>")
-            .replace(/%nav%/, nav)}
+    const startpage = {slug:"/",title:startTitle,html:renderToTemplate(startPage,startTitle)}
     return [startpage,...posts]
 }
 
