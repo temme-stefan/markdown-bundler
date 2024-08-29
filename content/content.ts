@@ -56,46 +56,70 @@ converter.listen("anchors.after", (_, text) => {
     })
 });
 
-export const getPosts = () => {
-    const slugs: string[] = [];
-    const posts = getFiles().map((fileinfo) => {
-        const {dir, name} = path.parse(fileinfo.filename);
-        let slug = `${dir}/${name}`;
-        if (!slug.startsWith("/")) {
-            slug = `/${slug}`;
-        }
-        slugs.push(slug);
-        const title = fileinfo.name;
-
-        const content = converter.makeHtml(readFileSync(fileinfo.filepath, {encoding: "utf8"}));
-        const html = template.replace(/%title%/g, title).replace(/%content%/, content);
-
-
-        return {slug, title, html, filename: fileinfo.filename};
-    })
+const createNav = (slugs:string[]):string=>{
     slugs.sort();
     const slugTree = pathesToFileTree(slugs);
-    const folder: TNode[] = [];
-    let stack = [slugTree];
-    while (stack.length > 0) {
-        const current = stack.pop();
-        if (current.children.size > 0) {
-            folder.push(current);
-            stack.push(...current.children.values());
+    const folder=[];
+    const htmlLines=["<ul>"]
+    const createLink= (item:TNode)=>{
+        folder.push(item.name);
+        htmlLines.push(`<li><a href="${folder.join("/")}">${item.name}</a></li>`)
+        folder.pop()
+    }
+    const startGroup= (item:TNode)=>{
+        folder.push(item.name);
+        htmlLines.push(`<li><details><summary>${item.name}</summary><ul>`)
+    }
+
+    const endGroup = (item:TNode)=>{
+        htmlLines.push(`</ul></details></li>`);
+        folder.pop()
+    }
+    const walkNode = (item:TNode)=>{
+        if (item.children.size > 0){
+            startGroup(item);
+            item.children.forEach(child=>walkNode(child));
+            endGroup(item);
+        }
+        else{
+            createLink(item);
         }
     }
-    const linkLists = folder.map((item) => {
-        let slug = item.name;
-        let current = item;
-        while (current.parent != null) {
-            current = current.parent;
-            slug = `${current.name}${current.name.endsWith("/") ? "" : "/"}${slug}`;
-        }
-        const md = [...item.children.values()].map(({name}) => `* [${name}](${encodeURI(`${slug}/${name}`)})`).join("\n");
-        const content = converter.makeHtml(md);
-        const html = template.replace(/%title%/g, item.name).replace(/%content%/, content);
-        return {slug, title: item.name, filename: slug, html}
-    });
-    return [...posts, ...linkLists]
+    htmlLines.push(`<li><a href="/">Start</a></li>`)
+    folder.push("")
+    slugTree.children.forEach(walkNode);
+    htmlLines.push("</ul>");
+
+    return htmlLines.join("\n");
+}
+
+export const getPosts = () => {
+    const slugToFileinfo: Map<string,ReturnType<typeof getFiles>[0]> = new Map();
+   getFiles().map((fileinfo) => {
+       const {dir, name} = path.parse(fileinfo.filename);
+       let slug = `${dir}/${name}`;
+       if (!slug.startsWith("/")) {
+           slug = `/${slug}`;
+       }
+       slugToFileinfo.set(slug, fileinfo);
+   });
+
+   const nav = createNav([...slugToFileinfo.keys()]);
+
+   const posts = [...slugToFileinfo.entries()].map(([slug,fileinfo])=>{
+        const title = fileinfo.name;
+        const content = converter.makeHtml(readFileSync(fileinfo.filepath, {encoding: "utf8"}));
+        const html = template
+            .replace(/%title%/g, title)
+            .replace(/%content%/, content)
+            .replace(/%nav%/, nav);
+        return {slug, title, html, filename: fileinfo.filename};
+    })
+    const startTitle = "Die Gezeichneten der Familie"
+    const startpage = {slug:"/",title:startTitle,html:template
+            .replace(/%title%/g, startTitle)
+            .replace(/%content%/, "<p>Notizen und Gedanken zu unserer Gezeichnetenkampagne.</p>")
+            .replace(/%nav%/, nav)}
+    return [startpage,...posts]
 }
 
