@@ -31,14 +31,11 @@ const converter = new Converter({
     moreStyling: true,
     strikethrough: true,
     metadata: true,
-    completeHTMLDocument: true
+    completeHTMLDocument: false
 });
 
-const fakeMeta = {title: "", lang: "de"}
-converter.listen("completeHTMLDocument.before", (_, text, __, ___, globals) => {
-    globals.metadata.parsed = {...globals.metadata.parsed, ...fakeMeta};
-    return `<h1>${fakeMeta.title}</h1>\n${text}`;
-});
+const template = readFileSync("content/template.html", {encoding: "utf8"});
+
 converter.listen("anchors.after", (_, text) => {
     const pattern = /href="[^"]*/g;
     return text.replace(pattern, (match) => {
@@ -59,12 +56,6 @@ converter.listen("anchors.after", (_, text) => {
     })
 });
 
-converter.listen("completeHTMLDocument.after", (_, text) => {
-    return text.replace("</head>", `
-     <link rel="stylesheet" href="/style/index.css">
-</head>`);
-});
-
 export const getPosts = () => {
     const slugs: string[] = [];
     const posts = getFiles().map((fileinfo) => {
@@ -75,8 +66,10 @@ export const getPosts = () => {
         }
         slugs.push(slug);
         const title = fileinfo.name;
-        fakeMeta.title = title;
-        const html = converter.makeHtml(readFileSync(fileinfo.filepath, {encoding: "utf8"}));
+
+        const content = converter.makeHtml(readFileSync(fileinfo.filepath, {encoding: "utf8"}));
+        const html = template.replace(/%title%/g, title).replace(/%content%/, content);
+
 
         return {slug, title, html, filename: fileinfo.filename};
     })
@@ -98,9 +91,9 @@ export const getPosts = () => {
             current = current.parent;
             slug = `${current.name}${current.name.endsWith("/") ? "" : "/"}${slug}`;
         }
-        fakeMeta.title = item.name;
         const md = [...item.children.values()].map(({name}) => `* [${name}](${encodeURI(`${slug}/${name}`)})`).join("\n");
-        const html = converter.makeHtml(md);
+        const content = converter.makeHtml(md);
+        const html = template.replace(/%title%/g, item.name).replace(/%content%/, content);
         return {slug, title: item.name, filename: slug, html}
     });
     return [...posts, ...linkLists]
