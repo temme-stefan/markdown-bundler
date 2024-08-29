@@ -29,13 +29,13 @@ body {
     font-family: 'Handwritten', cursive;
     font-size: 1.25rem;
     background: transparent;
-    padding: 0.5rem 0.5rem;
-    margin: 2rem .25rem .25rem;
     color: #41403E;
+    margin: 2rem .25rem .25rem;
+    border: solid 0.1em #4140344E;
+    padding: 0.5rem 0.5rem;
     box-shadow: 1em 1.5em 1.5em -1em rgba(0, 0, 0, 0.5);
     border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
     box-sizing: border-box;
-    border: solid 0.1em #4140344E;
     overflow: hidden;
 }
 
@@ -80,15 +80,25 @@ details li {
 }
 
 @media (min-width: 1024px) {
-    body {
-        display: grid;
-        gap: 2rem;
-        grid-template-columns: 400px 3fr;
+    #mobilewrapper>ul {
+        display: flex;
+    }
+    nav details:not(#mobilewrapper)>ul{
+        position: absolute;
+        background: #fffef0;
+        margin: 2rem .25rem .25rem;
+        border: solid 0.1em #4140344E;
+        padding: 0.5rem 0.5rem;
+        box-shadow: 1em 1.5em 1.5em -1em rgba(0, 0, 0, 0.5);
+        border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
     }
     #mobilewrapper > summary {
         display: none;
     }
-
+    a:hover, a:focus, summary:hover, summary:focus {
+        background-color: #41403E;
+        color: #fffef0;
+    }
 }
 
 

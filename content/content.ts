@@ -68,10 +68,10 @@ const createNav = (slugs:string[]):string=>{
     }
     const startGroup= (item:TNode)=>{
         folder.push(item.name);
-        htmlLines.push(`<li><details><summary>${item.name}</summary><ul>`)
+        htmlLines.push(`<li><details name="navgroup_depth_${folder.length}"><summary>${item.name}</summary><ul>`)
     }
 
-    const endGroup = (item:TNode)=>{
+    const endGroup = ()=>{
         htmlLines.push(`</ul></details></li>`);
         folder.pop()
     }
@@ -79,7 +79,7 @@ const createNav = (slugs:string[]):string=>{
         if (item.children.size > 0){
             startGroup(item);
             item.children.forEach(child=>walkNode(child));
-            endGroup(item);
+            endGroup();
         }
         else{
             createLink(item);
@@ -87,7 +87,14 @@ const createNav = (slugs:string[]):string=>{
     }
     htmlLines.push(`<li><a href="/">Start</a></li>`)
     folder.push("")
-    slugTree.children.forEach(walkNode);
+    const navItems = [...slugTree.children.values()];
+    const nodeComparer = (a:TNode,b:TNode)=>{
+        const aHasChilds =a.children.size>0;
+        const bHasChilds =b.children.size>0;
+        return aHasChilds === bHasChilds ?(a.name<b.name?-1:1) : (bHasChilds?-1:1);
+    }
+    navItems.sort(nodeComparer);
+    navItems.forEach(walkNode);
     htmlLines.push("</ul>");
 
     return htmlLines.join("\n");
