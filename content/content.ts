@@ -7,6 +7,7 @@ import {pathesToFileTree, TNode} from "./FileTree";
 
 dotenv.config();
 
+console.log(process.env.MD_BASEFOLDER);
 const base = process.env.MD_BASEFOLDER ?? "markdownfiles";
 const glob = process.env.MD_GLOB ?? "*.md";
 
