@@ -21,7 +21,6 @@ Disallow: /`);
 }
 
 async function addStyles() {
-
     await copy("style", path.join(buildpath, "style"));
 }
 

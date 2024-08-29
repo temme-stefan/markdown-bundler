@@ -36,10 +36,10 @@ body {
     border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
     box-sizing: border-box;
     border: solid 0.1em #4140344E;
-    width: fit-content;
     overflow: hidden;
 }
-:not(main)>a, :not(main)>em,:not(main)>strong, :not(main)>del, :not(main)>sup, :not(main)>sub , body nav *{
+
+:not(main) > a, :not(main) > em, :not(main) > strong, :not(main) > del, :not(main) > sup, :not(main) > sub, body nav * {
     margin: 0;
     border: 0;
     padding: 0;
@@ -59,25 +59,36 @@ img, video, iframe {
     font-family: "Mono";
     font-size: 2rem;
 }
+
 details {
-    display:inline-block;
+    display: inline-block;
 }
-nav li{
+
+nav li {
     list-style: none;
 }
 
-@media (min-width:1024px) {
+nav, main {
+    min-width: 100%
+}
+
+#mobilewrapper > summary {
+    list-style: none;
+}
+details li {
+    margin-left: 2rem;
+}
+
+@media (min-width: 1024px) {
     body {
         display: grid;
         gap: 2rem;
         grid-template-columns: 400px 3fr;
     }
-    nav{
-        min-width:100%
+    #mobilewrapper > summary {
+        display: none;
     }
-    details li{
-        margin-left:2rem;
-    }
+
 }
 
 
@@ -123,20 +134,23 @@ h6 {
     font-size: 1.05rem !important;
 }
 
-h1~:not(h1){
+h1 ~ :not(h1) {
     margin-left: 3rem;
 }
-h2~:not(h1,h2){
+
+h2 ~ :not(h1,h2) {
     margin-left: 6rem;
 }
-h3~:not(h1,h2,h3){
+
+h3 ~ :not(h1,h2,h3) {
     margin-left: 9rem;
 }
-h4~:not(h1,h2,h3,h4){
+
+h4 ~ :not(h1,h2,h3,h4) {
     margin-left: 12rem;
 }
 
-h5~:not(h1,h2,h3,h4,h5){
+h5 ~ :not(h1,h2,h3,h4,h5) {
     margin-left: 15rem;
 }
 

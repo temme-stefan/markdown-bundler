@@ -9,7 +9,13 @@
 </head>
 <body>
 <nav>
+    <details id="mobilewrapper">
+        <summary>☰</summary>
     %nav%
+    </details>
+    <script>
+        document.getElementById("mobilewrapper").open=window.matchMedia('(min-width: 1024px)').matches;
+    </script>
 </nav>
 <main>
     <h1 id="%title%">%title%</h1>
