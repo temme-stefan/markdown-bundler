@@ -180,6 +180,35 @@ h6 {
         margin-left: 15rem;
     }
 }
+
+* {
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+        background: #BE9C73;
+        border-radius: 0px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        border-radius: 10px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #fffef0;
+        border: solid 1px #4140344E;
+        border-radius: 10px;
+        width: 8px;
+        height: 8px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #41403E;
+    }
+}
+
 button, input[type="button"], input[type="reset"], input[type="submit"] {
     box-shadow: #8080803d .5rem .5em !important;
 }
