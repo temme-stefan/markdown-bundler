@@ -58,62 +58,73 @@ converter.listen("anchors.after", (_, text) => {
     })
 });
 
-const createNav = (slugs:string[]):string=>{
+const createNav = (slugs: string[]): string => {
     slugs.sort();
     const slugTree = pathesToFileTree(slugs);
-    const folder=[];
-    const htmlLines=["<ul>"]
-    const createLink= (item:TNode)=>{
+    const folder = [];
+    const htmlLines = ["<div>","<ul>"]
+    const createLink = (item: TNode) => {
         folder.push(item.name);
         htmlLines.push(`<li><a href="${folder.join("/")}">${item.name}</a></li>`)
         folder.pop()
     }
-    const startGroup= (item:TNode)=>{
+    const startGroup = (item: TNode) => {
         folder.push(item.name);
         htmlLines.push(`<li><details name="navgroup_depth_${folder.length}"><summary>${item.name}</summary><ul>`)
     }
 
-    const endGroup = ()=>{
+    const endGroup = () => {
         htmlLines.push(`</ul></details></li>`);
         folder.pop()
     }
-    const walkNode = (item:TNode)=>{
-        if (item.children.size > 0){
+    const walkNode = (item: TNode) => {
+        if (item.children.size > 0) {
             startGroup(item);
-            item.children.forEach(child=>walkNode(child));
+            item.children.forEach(child => walkNode(child));
             endGroup();
-        }
-        else{
+        } else {
             createLink(item);
         }
     }
     htmlLines.push(`<li><a href="/">Start</a></li>`)
     folder.push("")
-    const navItems = [...slugTree.children.values()];
-    const nodeComparer = (a:TNode,b:TNode)=>{
-        const aHasChilds =a.children.size>0;
-        const bHasChilds =b.children.size>0;
-        return aHasChilds === bHasChilds ?(a.name<b.name?-1:1) : (bHasChilds?-1:1);
+    const reserved = ["Archiv", "Andrew", "Frag den Meister"];
+    const [navItems, resItems] = [...slugTree.children.values()].reduce(([nav, res], c) => {
+        if (reserved.some(r => r.includes(c.name))) {
+            res.push(c);
+        } else {
+            nav.push(c);
+        }
+        return [nav, res];
+    }, [[], []]);
+    const nodeComparer = (a: TNode, b: TNode) => {
+        const aHasChilds = a.children.size > 0;
+        const bHasChilds = b.children.size > 0;
+        return aHasChilds === bHasChilds ? (a.name < b.name ? -1 : 1) : (bHasChilds ? -1 : 1);
     }
     navItems.sort(nodeComparer);
+    resItems.sort(nodeComparer);
+
     navItems.forEach(walkNode);
     htmlLines.push("</ul>");
-
+    htmlLines.push("<ul>");
+    resItems.forEach(walkNode);
+    htmlLines.push("</ul>","</div>");
     return htmlLines.join("\n");
 }
 
 export const getPosts = () => {
-    const slugToFileinfo: Map<string,ReturnType<typeof getFiles>[0]> = new Map();
-   getFiles().map((fileinfo) => {
-       const {dir, name} = path.parse(fileinfo.filename);
-       let slug = `${dir}/${name}`;
-       if (!slug.startsWith("/")) {
-           slug = `/${slug}`;
-       }
-       slugToFileinfo.set(slug, fileinfo);
-   });
+    const slugToFileinfo: Map<string, ReturnType<typeof getFiles>[0]> = new Map();
+    getFiles().map((fileinfo) => {
+        const {dir, name} = path.parse(fileinfo.filename);
+        let slug = `${dir}/${name}`;
+        if (!slug.startsWith("/")) {
+            slug = `/${slug}`;
+        }
+        slugToFileinfo.set(slug, fileinfo);
+    });
 
-   const nav = createNav([...slugToFileinfo.keys()]);
+    const nav = createNav([...slugToFileinfo.keys()]);
 
     function renderToTemplate(filepath: string, title: string) {
         const content = converter.makeHtml(readFileSync(filepath, {encoding: "utf8"}));
@@ -124,13 +135,13 @@ export const getPosts = () => {
         return html;
     }
 
-    const posts = [...slugToFileinfo.entries()].map(([slug,fileinfo])=>{
+    const posts = [...slugToFileinfo.entries()].map(([slug, fileinfo]) => {
         const title = fileinfo.name;
         const filepath = fileinfo.filepath;
         const html = renderToTemplate(filepath, title);
         return {slug, title, html, filename: fileinfo.filename};
     })
-    const startpage = {slug:"/",title:startTitle,html:renderToTemplate(startPage,startTitle)}
-    return [startpage,...posts]
+    const startpage = {slug: "/", title: startTitle, html: renderToTemplate(startPage, startTitle)}
+    return [startpage, ...posts]
 }
 
