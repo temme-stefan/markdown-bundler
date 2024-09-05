@@ -59,12 +59,9 @@ const loadButton = document.getElementById('loadButton') as HTMLButtonElement;
 const saveDialog = document.getElementById('saveDialog') as HTMLDialogElement;
 const loadDialog = document.getElementById('loadDialog') as HTMLDialogElement;
 const loadForm = document.getElementById('load') as HTMLFormElement;
+const copyButton = document.getElementById('copyButton') as HTMLButtonElement;
 init();
 
-
-function initCopy() {
-
-}
 
 function init() {
     total.addEventListener("change", () => updateNumber(total, (val) => state.total = val))
@@ -134,22 +131,37 @@ function initLoad() {
     })
 }
 
-const storageKey="ap_calculator";
-function storeState (name:string){
+function initCopy() {
+    copyButton.addEventListener("click", () => {
+        navigator.clipboard.writeText(stateToString());
+        const oldText = copyButton.innerText;
+        copyButton.innerText = "Kopiert!";
+        copyButton.disabled = true;
+        setTimeout(() => {
+            copyButton.innerText = oldText;
+            copyButton.disabled = false
+        }, 5000)
+
+    })
+}
+
+const storageKey = "ap_calculator";
+
+function storeState(name: string) {
     const saved = getStoredStates();
-    saved.set(name,state);
-    localStorage.setItem(storageKey,JSON.stringify([...saved.entries()]));
+    saved.set(name, state);
+    localStorage.setItem(storageKey, JSON.stringify([...saved.entries()]));
 }
 
-function getStoredStates (){
+function getStoredStates() {
     const stored = localStorage.getItem(storageKey) ?? "[]";
-    return new Map(JSON.parse(stored)) as Map<string,typeof state>;
+    return new Map(JSON.parse(stored)) as Map<string, typeof state>;
 }
 
-function downloadState(name:string){
-    const data = "data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state, null, 2));
+function downloadState(name: string) {
+    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
     const anchor = document.createElement("a");
-    anchor.setAttribute("href",     data);
+    anchor.setAttribute("href", data);
     anchor.setAttribute("download", name + ".json");
     document.body.appendChild(anchor); // required for firefox
     anchor.click();
@@ -162,10 +174,35 @@ function loadState(newState: typeof state) {
     total.value = `${state.total}`;
     level.value = `${state.level}`;
     expanses.innerHTML = "";
+    getRowsSorted().forEach(r => expanses.append(createNewExpanse(r)));
+    update();
+}
+
+function getRowsSorted() {
     const rows = [...state.sktBased, ...state.other];
     rows.sort((a, b) => Math.sign(a.order - b.order));
-    rows.forEach(r => expanses.append(createNewExpanse(r)));
-    update();
+    return rows;
+}
+
+function stateToString() {
+    return [`Level: ${state.level}`,
+        `AP: ${state.available} / ${state.total}`,
+        ``,
+        ...getRowsSorted().map(row => {
+            const parts = [] as string[];
+            if (isSkt(row)) {
+                parts.push(row.description);
+                parts.push(row.col);
+                parts.push(`${row.activation ? "aktiviert" : row.from} --> ${row.to}`);
+                parts.push(`${row.cost} AP`);
+            } else {
+                parts.push(row.description);
+                parts.push("\t")
+                parts.push(`${row.cost} AP`);
+            }
+            return parts.join("\t");
+        })
+    ].join("\n");
 }
 
 function validate() {
@@ -250,7 +287,7 @@ function formToRow(form: HTMLFormElement): sktRow | otherRow | false {
                 computedCost += leverage(0, to, state.level, col);
                 return {order, type, description, cost: computedCost, activation, col, to};
             }
-            if (!activation && Number.isFinite(from) && from<=to) {
+            if (!activation && Number.isFinite(from) && from <= to) {
                 computedCost += leverage(from, to, state.level, col);
                 return {order, type, description, cost: computedCost, activation, col, to, from};
             }
