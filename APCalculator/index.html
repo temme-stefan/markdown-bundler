@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+    <title>%title%</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+    <meta name="lang" content="de">
+    <link rel="stylesheet" href="../style/index.css">
+    <script src="APCalculator.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+    <link rel="stylesheet" href="form.css">
+</head>
+<body>
+<nav>
+    <details id="mobilewrapper">
+        <summary>☰</summary>
+        %nav%
+    </details>
+    <script>
+        document.getElementById("mobilewrapper").open=window.matchMedia('(min-width: 1024px)').matches;
+    </script>
+</nav>
+<main>
+    <h1>%title%</h1>
+    <section>
+        <label for="totalAP">verfügbare AP
+            <output id="totalAPout"></output>
+            /<input type="number" id="totalAP"></label>
+        <label for="level">Level <input type="number" id="level"></label>
+        <button id="saveButton">Speichern</button>
+        <button id="loadButton">Laden</button>
+        <button id="copyButton">Kopieren</button>
+    </section>
+    <section id="expanses">
+    </section>
+</main>
+<dialog id="saveDialog">
+    <h2>Speichern</h2>
+    <form id="save" method="dialog">
+        <label>Name<input type="text" id="saveName" required/></label>
+        <button value="cancel">Abbrechen</button>
+        <button value="local">Browser</button>
+        <button value="download">Download</button>
+    </form>
+</dialog>
+<dialog id="loadDialog">
+    <h2>Laden</h2>
+    <form id="load" method="dialog">
+        <label>Name <select id="saved" name="saved"></select></label>
+        <input type="file" name="upload" accept=".json,text/json"/>
+        <button value="cancel">Abbrechen</button>
+        <button value="load">Laden</button>
+    </form>
+</dialog>
+<template id="expanse">
+    <form>
+        <label>Typ
+            <select name="type">
+                <option value="skt" selected>nach SKT</option>
+                <option value="free">frei</option>
+            </select>
+        </label>
+        <label>Beschreibung
+            <input type="text" name="description"/>
+        </label>
+        <label>Spalte
+            <select name="col">
+                <option value="A+">A+</option>
+                <option value="A">A</option>
+                <option value="B" selected>B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+
+            </select>
+        </label>
+        <label>Aktivierung
+            <input type="checkbox" name="activation"/>
+        </label>
+        <label>Start
+            <input type="number" name="from" value="0"/>
+        </label>
+        <label>Ziel
+            <input type="number" name="to" value="0"/>
+        </label>
+        <label>Kosten
+            <input type="number" name="cost"/>
+        </label>
+    </form>
+</template>
+</body>
+</html>

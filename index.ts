@@ -24,13 +24,18 @@ async function addStyles() {
     await copy("style", path.join(buildpath, "style"));
 }
 
+async function addAPCalculator(){
+    await copy("./APCalculator/APCalculator.js",path.join(buildpath,"Tools/AP Rechner/APCalculator.js"));
+    await copy("./APCalculator/script.js",path.join(buildpath,"Tools/AP Rechner/script.js"));
+    await copy("./APCalculator/form.css",path.join(buildpath,"Tools/AP Rechner/form.css"));
+}
 emptyBuildFolder().then(async () => {
     const posts = getPosts();
     await Promise.all([...posts.map(async post => {
         const p = path.join(buildpath, post.slug, "index.html");
         console.log("Creating", post.slug)
         await outputFile(p, post.html);
-    }), addRobots(), addStyles()])
+    }), addRobots(), addStyles(),addAPCalculator()])
     console.log("done");
 });
 

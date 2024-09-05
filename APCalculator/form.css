@@ -1,0 +1,49 @@
+input[type=number], output {
+    min-width: 5rem;
+    width: 5rem;
+    display: inline-block;
+    text-align: right;
+}
+
+/* Chrome, Safari, Edge, Opera */
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+input:invalid:not(:focus) {
+    border-color: red;
+}
+
+label:has(input:invalid)::after {
+    content: attr(data-validation);
+    color: red;
+}
+
+input[readonly]{
+    cursor: auto;
+    background: rgba(0,0,0,10%);
+}
+
+#expanses {
+    label:has([disabled]){
+        display: none;
+    }
+}
+
+#saveDialog,#loadDialog{
+    margin:auto;
+    box-shadow: 0 0 0 black, 0 0 6em #8a4d0f inset;
+    background: #fffef0;
+    &[open]::backdrop{
+        background: rgba(0,0,0,0.2);
+    }
+}

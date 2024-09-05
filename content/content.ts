@@ -104,7 +104,7 @@ const createNav = (slugs: string[]): string => {
     }
     navItems.sort(nodeComparer);
     resItems.sort(nodeComparer);
-
+    navItems.push({name:"Tools",children:new Map([["AP Rechner",{name:"AP Rechner", children:new Map()}]])})
     navItems.forEach(walkNode);
     htmlLines.push("</ul>");
     htmlLines.push("<ul>");
@@ -128,11 +128,10 @@ export const getPosts = () => {
 
     function renderToTemplate(filepath: string, title: string) {
         const content = converter.makeHtml(readFileSync(filepath, {encoding: "utf8"}));
-        const html = template
+        return template
             .replace(/%title%/g, title)
             .replace(/%content%/, content)
             .replace(/%nav%/, nav);
-        return html;
     }
 
     const posts = [...slugToFileinfo.entries()].map(([slug, fileinfo]) => {
@@ -142,6 +141,19 @@ export const getPosts = () => {
         return {slug, title, html, filename: fileinfo.filename};
     })
     const startpage = {slug: "/", title: startTitle, html: renderToTemplate(startPage, startTitle)}
-    return [startpage, ...posts]
+    return [startpage, ...posts,...getTools(nav)]
 }
 
+const getTools = (nav)=>{
+    const apTitle = "AP Rechner";
+    const APCalculator = {
+        slug:"/Tools/AP Rechner",
+        title:apTitle,
+        html:readFileSync("./APCalculator/index.html", {encoding: "utf8"})
+            .replace(/%title%/g, apTitle)
+            .replace(/%nav%/, nav)
+            .replace("../style/index.css","/style/index.css")
+    }
+
+    return  [APCalculator];
+}

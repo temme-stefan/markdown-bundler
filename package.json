@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "ts-run": "ts-node",
-    "build": "ts-node -- index.ts",
+    "build": "cd APCalculator;tsc;cd ..; ts-node -- index.ts;",
     "deploy": "ssh u106909590@access895651998.webspace-data.io \"rm -rf ~/staticSites/gezeichnet/*\" && scp -r build/* u106909590@access895651998.webspace-data.io:~/staticSites/gezeichnet"
   },
   "author": "Stefan Temme",
