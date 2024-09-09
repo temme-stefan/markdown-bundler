@@ -24,6 +24,7 @@ type sktLevereage = baseRow & {
 type sktRow = sktActivation | sktLevereage;
 
 let state: {
+    name?: string
     expended: number
     total: number
     available: number
@@ -32,6 +33,7 @@ let state: {
     other: otherRow[]
     valid: boolean
 } = {
+    name: "",
     expended: 0,
     total: 0,
     available: 0,
@@ -75,7 +77,8 @@ function init() {
 function initSave() {
     saveButton.addEventListener("click", () => {
         const s = new Date().toISOString();
-        saveDialog.querySelector("input")!.value = `${s.substring(0, 10)}_${s.substring(11, 16)}`;
+        const name = (state.name == "" || state.name == null) ? `${s.substring(0, 10)}_${s.substring(11, 16)}` : state.name;
+        saveDialog.querySelector("input")!.value = name;
         saveDialog.showModal();
     });
     saveDialog.querySelector("button[value=cancel]")?.addEventListener("click", (e) => {
@@ -118,12 +121,16 @@ function initLoad() {
                 reader.readAsText(data.get("upload") as File, "UTF-8");
                 reader.onload = function (evt) {
                     const text = evt.target?.result as string;
-                    loadState(JSON.parse(text))
+                    const newState = JSON.parse(text);
+                    const filename = (data.get("upload") as File).name;
+                    newState.name=filename.substring(0,filename.length-5);
+                    loadState(newState)
                 }
             } else {
                 const key = data.get("saved") as string ?? "";
                 const newstate = getStoredStates().get(key);
                 if (newstate) {
+                    newstate.name=key;
                     loadState(newstate);
                 }
             }
@@ -149,7 +156,7 @@ const storageKey = "ap_calculator";
 
 function storeState(name: string) {
     const saved = getStoredStates();
-    saved.set(name, state);
+    saved.set(name, {...state, name});
     localStorage.setItem(storageKey, JSON.stringify([...saved.entries()]));
 }
 

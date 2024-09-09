@@ -1,5 +1,6 @@
 import { activate, leverage } from "./APCalculator.js";
 let state = {
+    name: "",
     expended: 0,
     total: 0,
     available: 0,
@@ -38,7 +39,8 @@ function initSave() {
     var _a;
     saveButton.addEventListener("click", () => {
         const s = new Date().toISOString();
-        saveDialog.querySelector("input").value = `${s.substring(0, 10)}_${s.substring(11, 16)}`;
+        const name = (state.name == "" || state.name == null) ? `${s.substring(0, 10)}_${s.substring(11, 16)}` : state.name;
+        saveDialog.querySelector("input").value = name;
         saveDialog.showModal();
     });
     (_a = saveDialog.querySelector("button[value=cancel]")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", (e) => {
@@ -83,13 +85,17 @@ function initLoad() {
                 reader.onload = function (evt) {
                     var _a;
                     const text = (_a = evt.target) === null || _a === void 0 ? void 0 : _a.result;
-                    loadState(JSON.parse(text));
+                    const newState = JSON.parse(text);
+                    const filename = data.get("upload").name;
+                    newState.name = filename.substring(0, filename.length - 5);
+                    loadState(newState);
                 };
             }
             else {
                 const key = (_c = data.get("saved")) !== null && _c !== void 0 ? _c : "";
                 const newstate = getStoredStates().get(key);
                 if (newstate) {
+                    newstate.name = key;
                     loadState(newstate);
                 }
             }
@@ -111,7 +117,7 @@ function initCopy() {
 const storageKey = "ap_calculator";
 function storeState(name) {
     const saved = getStoredStates();
-    saved.set(name, state);
+    saved.set(name, Object.assign(Object.assign({}, state), { name }));
     localStorage.setItem(storageKey, JSON.stringify([...saved.entries()]));
 }
 function getStoredStates() {
