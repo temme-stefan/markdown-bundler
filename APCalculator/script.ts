@@ -2,6 +2,7 @@ import {activate, leverage, TSpalte} from "./APCalculator.js"
 
 type baseRow = {
     order: number,
+    active:boolean,
     description: string,
     cost: number
 }
@@ -197,6 +198,7 @@ function stateToString() {
         ``,
         ...getRowsSorted().map(row => {
             const parts = [] as string[];
+            parts.push(row.active?"aktive":"inaktiv");
             if (isSkt(row)) {
                 parts.push(row.description);
                 parts.push(row.col);
@@ -269,7 +271,8 @@ function formToRow(form: HTMLFormElement): sktRow | otherRow | false {
     const data = new Map(new FormData(form)) as Map<string, string>;
     const order = Number.parseInt(form.dataset.order ?? "");
     if (Number.isFinite(order)) {
-        const {type, description, col, activation, from, to, cost} = {
+        const {active,type, description, col, activation, from, to, cost} = {
+            active:data.get("active") === "on",
             type: data.get("type"),
             description: data.get("description") ?? "",
             col: data.get("col") ?? "",
@@ -280,7 +283,7 @@ function formToRow(form: HTMLFormElement): sktRow | otherRow | false {
         }
 
         if (type == "free" && Number.isFinite(cost) && description.length > 0) {
-            return {order, type, description, cost}
+            return {active, order, type, description, cost}
         }
         if (
             type === "skt"
@@ -292,11 +295,11 @@ function formToRow(form: HTMLFormElement): sktRow | otherRow | false {
             if (activation) {
                 computedCost += activate(state.level, col);
                 computedCost += leverage(0, to, state.level, col);
-                return {order, type, description, cost: computedCost, activation, col, to};
+                return {active, order, type, description, cost: computedCost, activation, col, to};
             }
             if (!activation && Number.isFinite(from) && from <= to) {
                 computedCost += leverage(from, to, state.level, col);
-                return {order, type, description, cost: computedCost, activation, col, to, from};
+                return {active, order, type, description, cost: computedCost, activation, col, to, from};
             }
         }
 
@@ -346,10 +349,10 @@ function updateUI() {
 
 function updateCalculation() {
     let expended = 0;
-    state.sktBased.forEach(row => {
+    state.sktBased.filter(row=>row.active).forEach(row => {
         expended += row.cost
     });
-    state.other.forEach(row => expended += row.cost);
+    state.other.filter(row=>row.active).forEach(row => expended += row.cost);
     state.expended = expended;
     state.available = state.total - state.expended;
 }

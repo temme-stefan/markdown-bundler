@@ -26,7 +26,7 @@
         <label for="totalAP">verfügbare AP
             <output id="totalAPout"></output>
             /<input type="number" id="totalAP"></label>
-        <label for="level">Level <input type="number" id="level"></label>
+        <label for="level">Stufe <input type="number" id="level"></label>
         <button id="saveButton">Speichern</button>
         <button id="loadButton">Laden</button>
         <button id="copyButton">Kopieren</button>
@@ -54,6 +54,9 @@
 </dialog>
 <template id="expanse">
     <form>
+        <label>
+            <input type="checkbox" name="active" checked/>
+        </label>
         <label>Typ
             <select name="type">
                 <option value="skt" selected>nach SKT</option>
