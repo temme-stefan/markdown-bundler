@@ -111,12 +111,18 @@ details li {
         display: none;
     }
 
-    a:hover, a:focus, summary:hover, summary:focus {
+    a:hover, a:focus, summary:hover, summary:focus, a.active, details:has(a.active)>summary {
         background-color: #41403E;
         color: #fffef0;
     }
 }
 
+nav{
+    a.active, details:has(a.active):not(#mobilewrapper)>summary {
+        background-color: #41403E;
+        color: #fffef0;
+    }
+}
 
 /* Rotations */
 

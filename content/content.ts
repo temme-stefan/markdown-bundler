@@ -110,6 +110,7 @@ const createNav = (slugs: string[]): string => {
     htmlLines.push("<ul>");
     resItems.forEach(walkNode);
     htmlLines.push("</ul>","</div>");
+    htmlLines.push("<script>document.querySelector(`[href=\"${decodeURIComponent(location.pathname).slice(0,-1)}\"]`).classList.add(\"active\")</script>")
     return htmlLines.join("\n");
 }
 
