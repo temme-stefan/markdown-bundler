@@ -6,7 +6,7 @@
   "scripts": {
     "ts-run": "ts-node",
     "build": "cd APCalculator;tsc;cd ..; ts-node -- index.ts;",
-    "deploy": "ssh u106909590@access895651998.webspace-data.io \"rm -rf ~/staticSites/gezeichnet/*\" && scp -r build/* u106909590@access895651998.webspace-data.io:~/staticSites/gezeichnet"
+    "deploy": "ssh gezeichnet.teamtemme.de \"rm -rf ~/staticSites/gezeichnet/*\" && scp -r build/* gezeichnet.teamtemme.de:~/staticSites/gezeichnet"
   },
   "author": "Stefan Temme",
   "license": "MIT",
